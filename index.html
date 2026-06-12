@@ -14,28 +14,45 @@ body{
   -webkit-tap-highlight-color:transparent;
   touch-action:manipulation;user-select:none
 }
-#app{text-align:center;padding:12px}
-h1{
-  font-size:22px;font-weight:300;letter-spacing:5px;
-  text-transform:uppercase;color:#777;margin-bottom:8px
+#app{text-align:center;padding:12px;width:100%;max-width:700px}
+
+/* Header */
+#header{
+  display:flex;justify-content:center;align-items:center;gap:12px;
+  margin-bottom:6px;position:relative
 }
-h1 span{color:#00ff88}
+#header h1{
+  font-size:22px;font-weight:300;letter-spacing:5px;
+  text-transform:uppercase;color:#777
+}
+#header h1 span{color:#00ff88}
+#help-btn{
+  background:none;border:1px solid #2a2a44;color:#555;
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  font-size:14px;line-height:1;display:inline-flex;align-items:center;
+  justify-content:center;transition:all .2s;flex-shrink:0;font-family:inherit
+}
+#help-btn:hover{border-color:#00ff88;color:#00ff88}
+
+#level-bar{display:flex;justify-content:center;align-items:center;gap:16px;height:22px;margin-bottom:4px}
+#level-name{color:#00ff88;font-size:14px;letter-spacing:2px;font-weight:400}
+#level-count{color:#555;font-size:12px;letter-spacing:1px}
+
 #canvas-wrap{
   position:relative;display:inline-block;
   border-radius:10px;overflow:hidden;
   box-shadow:0 0 60px rgba(0,255,136,0.06),inset 0 0 0 1px rgba(255,255,255,0.04)
 }
-canvas{display:block;background:#0d0d1a;cursor:pointer;touch-action:none}
-#level-bar{margin-bottom:8px;display:flex;justify-content:center;align-items:center;gap:16px;height:24px}
-#level-name{color:#00ff88;font-size:14px;letter-spacing:2px;font-weight:400}
-#level-count{color:#555;font-size:12px;letter-spacing:1px}
+canvas{display:block;background:#0d0d1a;cursor:crosshair;touch-action:none}
 #level-desc{color:#666;font-size:12px;letter-spacing:0.5px;margin-top:4px;min-height:18px}
-#controls{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+
+/* Controls */
+#controls{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 button{
   background:#18182a;border:1px solid #2a2a44;color:#999;
-  padding:8px 24px;border-radius:6px;font-size:14px;cursor:pointer;
+  padding:7px 18px;border-radius:6px;font-size:13px;cursor:pointer;
   transition:all .2s;letter-spacing:1px;font-family:inherit;
-  touch-action:manipulation
+  touch-action:manipulation;white-space:nowrap
 }
 button:hover{background:#222244;border-color:#444;color:#ccc}
 button:active{transform:scale(.96)}
@@ -44,14 +61,79 @@ button.primary:hover{background:#22ff99}
 button.primary:disabled{opacity:.3;cursor:not-allowed}
 button.danger{color:#ff4466;border-color:#442233}
 button.danger:hover{border-color:#ff4466}
-#legend{
-  display:flex;gap:14px;justify-content:center;margin-top:10px;
-  font-size:11px;color:#555;flex-wrap:wrap
-}
-.legend-item{display:flex;align-items:center;gap:4px}
-.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
-#tooltip{color:#666;font-size:12px;letter-spacing:.5px;margin-top:10px;min-height:18px}
+button.hint-btn{color:#ffbb00;border-color:#443300}
+button.hint-btn:hover{border-color:#ffbb00;color:#ffcc33}
+button.hint-btn:disabled{opacity:.3;cursor:not-allowed}
 
+/* Tooltip + tool indicator */
+#toolbar-info{
+  display:flex;justify-content:center;align-items:center;gap:8px;
+  margin-top:8px;font-size:12px;color:#666;min-height:20px;
+  letter-spacing:0.5px;flex-wrap:wrap
+}
+#tool-indicator{
+  display:none;padding:2px 10px;border-radius:4px;
+  font-size:11px;letter-spacing:1px;font-weight:600
+}
+#tool-indicator.active{display:inline-block}
+
+/* Palette (clickable legend) */
+#palette{
+  display:flex;gap:4px;justify-content:center;margin-top:8px;flex-wrap:wrap
+}
+.palette-btn{
+  display:flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid transparent;border-radius:5px;
+  padding:3px 8px;cursor:pointer;color:#555;font-size:11px;
+  transition:all .15s;font-family:inherit;touch-action:manipulation;
+  white-space:nowrap
+}
+.palette-btn:hover{border-color:#3a3a5a;color:#888}
+.palette-btn.active{border-color:#00ff88;color:#ccc;background:rgba(0,255,136,0.08)}
+.palette-btn .dot{
+  width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0
+}
+.palette-btn .key-hint{
+  font-size:9px;color:#444;margin-left:2px;font-weight:400
+}
+
+/* Help overlay */
+#help-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.92);z-index:200;
+  justify-content:center;align-items:center;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)
+}
+#help-overlay.active{display:flex}
+#help-panel{
+  background:#0d0d1a;border:1px solid #2a2a44;border-radius:12px;
+  padding:28px 28px;max-width:480px;width:92%;max-height:85vh;
+  overflow-y:auto;text-align:left;position:relative
+}
+#help-panel::-webkit-scrollbar{width:4px}
+#help-panel::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+#help-panel h2{
+  color:#00ff88;font-weight:300;letter-spacing:3px;font-size:20px;
+  margin-bottom:14px;text-align:center
+}
+#help-panel h3{
+  color:#aaa;font-size:13px;margin:14px 0 5px;letter-spacing:1px;
+  font-weight:400;border-bottom:1px solid #1a1a2e;padding-bottom:4px
+}
+#help-panel p,#help-panel li{color:#777;font-size:12.5px;line-height:1.7}
+#help-panel ul{padding-left:18px}
+#help-panel .hl{color:#00ccff}
+#help-panel .hlg{color:#00ff88}
+#help-panel .hlp{color:#cc44ff}
+#help-panel .hly{color:#ffbb00}
+#help-panel .close-help{
+  display:block;margin:18px auto 0;padding:9px 36px;
+  background:#00ff88;color:#000;border:0;border-radius:6px;
+  cursor:pointer;font-weight:600;font-size:14px;letter-spacing:1px
+}
+#help-panel .close-help:hover{background:#33ffaa}
+
+/* Victory / Fail overlays */
 #victory-overlay{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.88);justify-content:center;align-items:center;
@@ -87,15 +169,20 @@ button.danger:hover{border-color:#ff4466}
 #fail-overlay button:hover{background:#333;border-color:#777}
 
 @media(max-width:500px){
-  h1{font-size:18px;letter-spacing:3px}
-  #controls button{padding:8px 18px;font-size:13px}
-  #legend{gap:10px;font-size:10px}
+  #header h1{font-size:18px;letter-spacing:3px}
+  #controls button{padding:6px 14px;font-size:12px}
+  #palette{gap:2px}
+  .palette-btn{padding:2px 6px;font-size:10px}
+  #help-panel{padding:20px 18px}
 }
 </style>
 </head>
 <body>
 <div id="app">
-  <h1>⚡ <span>RESONATE</span></h1>
+  <div id="header">
+    <h1>⚡ <span>RESONATE</span></h1>
+    <button id="help-btn" title="Help">?</button>
+  </div>
   <div id="level-bar">
     <span id="level-name">First Light</span>
     <span id="level-count">1 / 5</span>
@@ -107,18 +194,43 @@ button.danger:hover{border-color:#ff4466}
   <div id="controls">
     <button id="pulseBtn" class="primary">▶ PULSE</button>
     <button id="clearBtn" class="danger">✕ CLEAR</button>
+    <button id="hintBtn" class="hint-btn">💡 HINT</button>
   </div>
-  <div id="tooltip">Click cells to cycle: <span style="color:#00ccff">○ Wire</span> · <span style="color:#cc44ff">◈ Split</span> · <span style="color:#ffbb00">◉ Resonate</span></div>
-  <div id="legend">
-    <span class="legend-item"><span class="legend-dot" style="background:#00ff88"></span>Source</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ff3366"></span>Target</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#00ccff"></span>Wire</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#cc44ff"></span>Splitter</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#ffbb00"></span>Resonator</span>
-    <span class="legend-item"><span class="legend-dot" style="background:#222244;border:1px solid #333"></span>Block</span>
+  <div id="toolbar-info">
+    <span id="tooltip">Select a tool from the palette below, then tap cells to place</span>
+    <span id="tool-indicator"></span>
+  </div>
+  <div id="palette"></div>
+</div>
+
+<!-- Help Overlay -->
+<div id="help-overlay">
+  <div id="help-panel">
+    <h2>✦ HOW TO PLAY ✦</h2>
+    <h3>🎯 Goal</h3>
+    <p>Route the signal from the green <span class="hlg">Source (S)</span> to every red <span class="hl">Target (T)</span> by placing conductive nodes on the grid.</p>
+    
+    <h3>🛠️ Placing Nodes</h3>
+    <p>Select a tool from the palette below the grid, then <strong>tap any cell</strong> to place that node. Tap a filled cell to remove it. Switch tools anytime — no cycling needed!</p>
+    
+    <h3>🔊 Node Types</h3>
+    <ul>
+      <li><span class="hl">◇ Wire</span> — conducts the signal in a straight path</li>
+      <li><span class="hlp">◈ Splitter</span> — branches the signal into multiple paths</li>
+      <li><span class="hly">◎ Resonator</span> — sustains the signal with rich harmonics</li>
+    </ul>
+    <p><strong>Keyboard shortcuts:</strong> <kbd>1</kbd> Wire · <kbd>2</kbd> Splitter · <kbd>3</kbd> Resonator · <kbd>4</kbd> Eraser · <kbd>Space</kbd> Pulse · <kbd>R</kbd> Clear all · <kbd>H</kbd> Hint · <kbd>?</kbd> Help</p>
+    
+    <h3>▶ Sending the Signal</h3>
+    <p>Press <strong>PULSE</strong> to send the wave through your network. Each node lights up with a glowing ring as the signal passes through, playing a unique synthesized tone. The wave expands one cell at a time — all targets must be connected!</p>
+    
+    <h3>💡 Stuck?</h3>
+    <p>Press <strong>HINT</strong> to see a suggested path light up on the grid. The hint shows which cells to fill.</p>
+    <button class="close-help">GOT IT</button>
   </div>
 </div>
 
+<!-- Victory Overlay -->
 <div id="victory-overlay">
   <h2>✦ RESONANCE ✦</h2>
   <div class="sub">Signal reached all targets</div>
@@ -127,6 +239,7 @@ button.danger:hover{border-color:#ff4466}
   <button id="retryVBtn" class="secondary">↺ RETRY</button>
 </div>
 
+<!-- Fail Overlay -->
 <div id="fail-overlay">
   <h2>✧ SIGNAL LOST</h2>
   <p>The wave couldn't reach all targets. Try a different path.</p>
@@ -183,19 +296,21 @@ const LEVELS = [
 ];
 
 // ── STATE ──
-let L = 0; // current level index
-let grid = [];      // 2D array of node types
-let fixed = [];     // 2D array of bools (cells player can't change)
+let L = 0;
+let grid = [];
+let fixed = [];
 let state = 'IDLE'; // IDLE | PULSING | DONE | FAIL
-let visited = [];   // 2D bool visited by wave
-let waveCells = []; // array of [r,c] currently in wavefront
-let waveStep = 0;
+let visited = [];
+let waveCells = [];
 let waveTimer = null;
 let particles = [];
 let audioCtx = null;
-let muted = false;
 let animId = null;
-let pulseTime = 0;
+let animTime = 0;
+let selectedTool = null; // null = eraser, or WIRE/SPLIT/RESO
+let tapFlashes = [];
+let hintPath = [];  // [[r,c], ...] cells highlighted by hint
+let hintTimer = null;
 
 // canvas
 const canvas = document.getElementById('c');
@@ -203,7 +318,7 @@ const ctx = canvas.getContext('2d');
 let CELL = 0;
 
 function calcCellSize() {
-  const maxH = window.innerHeight - 210;
+  const maxH = window.innerHeight - 240;
   const maxW = window.innerWidth - 40;
   const c = Math.min(Math.floor(maxH / ROWS), Math.floor(maxW / COLS), 64);
   return Math.max(c, 30);
@@ -215,6 +330,65 @@ function resizeCanvas() {
   canvas.height = ROWS * CELL;
   canvas.style.width = canvas.width + 'px';
   canvas.style.height = canvas.height + 'px';
+}
+
+// ── PALETTE (tool selection) ──
+const TOOLS = [
+  {type: WIRE,  label:'◇ Wire',     color:'#00ccff', key:'1'},
+  {type: SPLIT, label:'◈ Splitter',  color:'#cc44ff', key:'2'},
+  {type: RESO,  label:'◎ Resonator', color:'#ffbb00', key:'3'},
+  {type: null,  label:'✕ Eraser',    color:'#ff4466', key:'4'},
+];
+
+function buildPalette(){
+  const el = document.getElementById('palette');
+  el.innerHTML = '';
+  TOOLS.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'palette-btn';
+    btn.dataset.tool = t.type === null ? 'eraser' : String(t.type);
+    btn.innerHTML = `<span class="dot" style="background:${t.color}"></span> ${t.label} <span class="key-hint">${t.key}</span>`;
+    btn.addEventListener('pointerdown', (e) => { e.preventDefault(); selectTool(t.type); });
+    btn.addEventListener('click', () => selectTool(t.type));
+    el.appendChild(btn);
+  });
+  updatePaletteUI();
+}
+
+function selectTool(type){
+  selectedTool = (selectedTool === type) ? null : type;
+  updatePaletteUI();
+  updateTooltip();
+  canvas.style.cursor = selectedTool !== null ? 'crosshair' : 'default';
+}
+
+function updatePaletteUI(){
+  document.querySelectorAll('.palette-btn').forEach(btn => {
+    const isEraser = btn.dataset.tool === 'eraser';
+    const btnType = isEraser ? null : Number(btn.dataset.tool);
+    btn.classList.toggle('active', selectedTool === btnType);
+  });
+}
+
+function updateTooltip(){
+  const tip = document.getElementById('tooltip');
+  const ind = document.getElementById('tool-indicator');
+  if(selectedTool === null){
+    tip.textContent = 'Eraser active — tap filled cells to remove them';
+    ind.className = 'active';
+    ind.style.background = 'rgba(255,68,102,0.15)';
+    ind.style.color = '#ff4466';
+    ind.style.border = '1px solid #ff4466';
+    ind.textContent = '✕ ERASER';
+  } else {
+    const t = TOOLS.find(t => t.type === selectedTool);
+    tip.textContent = `${t.label} selected — tap empty cells to place`;
+    ind.className = 'active';
+    ind.style.background = t.color + '18';
+    ind.style.color = t.color;
+    ind.style.border = '1px solid ' + t.color + '44';
+    ind.textContent = t.label;
+  }
 }
 
 // ── GRID HELPERS ──
@@ -234,25 +408,30 @@ function loadLevel(idx){
     grid[br][bc]=BLOCK; fixed[br][bc]=true;
   }
   resetWave();
+  clearHint();
   document.getElementById('level-name').textContent = lv.name;
   document.getElementById('level-count').textContent = `${idx+1} / ${LEVELS.length}`;
   document.getElementById('level-desc').textContent = lv.desc;
-  document.getElementById('pulseBtn').disabled = false;
+  pulseBtn.disabled = false;
+  hintBtn.disabled = false;
   L = idx;
 }
 
 function resetWave(){
   visited = Array.from({length:ROWS},()=>Array(COLS).fill(false));
   waveCells = [];
-  waveStep = 0;
   particles = [];
   if(waveTimer){clearInterval(waveTimer);waveTimer=null}
   state = 'IDLE';
   document.getElementById('victory-overlay').classList.remove('active');
   document.getElementById('fail-overlay').classList.remove('active');
-  document.getElementById('pulseBtn').textContent = '▶ PULSE';
-  document.getElementById('pulseBtn').disabled = false;
-  document.getElementById('tooltip').textContent = 'Click cells to place nodes, then press PULSE to send the signal.';
+  pulseBtn.textContent = '▶ PULSE';
+  pulseBtn.disabled = false;
+}
+
+function clearHint(){
+  hintPath = [];
+  if(hintTimer){clearTimeout(hintTimer);hintTimer=null}
 }
 
 // ── AUDIO ──
@@ -262,7 +441,7 @@ function initAudio(){
 }
 
 function playNote(freq, dur=0.15, type='sine', vol=0.10, delay=0){
-  if(!audioCtx||muted) return;
+  if(!audioCtx) return;
   try{
     const t = audioCtx.currentTime + delay;
     const o = audioCtx.createOscillator();
@@ -285,20 +464,141 @@ function playNodeSound(t){
   }
 }
 
+// ── HINT SYSTEM (BFS pathfinder) ──
+function findHint(){
+  if(state === 'PULSING') return;
+  initAudio();
+  playNote(500,0.1,'triangle',0.04);
+  clearHint();
+
+  const lv = LEVELS[L];
+  const [sr, sc] = lv.src;
+  const visitedCells = new Set();
+  const hintCells = [];
+
+  // BFS from source — treat EMPTY cells as traversable
+  const queue = [[sr, sc]];
+  visitedCells.add(sr*COLS+sc);
+  const parent = {};
+
+  // Collect all targets we need to reach
+  const targetsLeft = lv.tgts.map(([tr,tc]) => tr*COLS+tc);
+  const reachedTargets = [];
+
+  while(queue.length > 0 && targetsLeft.length > 0){
+    const [r,c] = queue.shift();
+    const key = r*COLS+c;
+
+    // Check if this is a target
+    const tgtIdx = targetsLeft.indexOf(key);
+    if(tgtIdx !== -1){
+      reachedTargets.push(key);
+      targetsLeft.splice(tgtIdx, 1);
+      if(targetsLeft.length === 0) break;
+    }
+
+    for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]){
+      const nr=r+dr, nc=c+dc;
+      if(!inBounds(nr,nc)) continue;
+      const nkey = nr*COLS+nc;
+      if(visitedCells.has(nkey)) continue;
+      const nt = grid[nr][nc];
+      if(nt === BLOCK) continue;
+      // Can traverse: EMPTY, WIRE, SPLIT, RESO, SRC, TGT
+      visitedCells.add(nkey);
+      parent[nkey] = key;
+      queue.push([nr,nc]);
+    }
+  }
+
+  // Reconstruct paths from each reached target back to source
+  for(const tgt of reachedTargets){
+    let cur = tgt;
+    while(cur !== sr*COLS+sc){
+      const [r,c] = [Math.floor(cur/COLS), cur%COLS];
+      // Only add EMPTY cells (player fills these)
+      if(grid[r][c] === EMPTY && !hintCells.some(([hr,hc]) => hr===r && hc===c)){
+        hintCells.push([r,c]);
+      }
+      cur = parent[cur];
+      if(!cur && cur !== 0) break;
+    }
+  }
+
+  // If no path found, try direct BFS ignoring current grid (show where to place)
+  if(hintCells.length === 0){
+    // Re-run with all non-block cells as traversable
+    const v2 = new Set();
+    const q2 = [[sr,sc]];
+    v2.add(sr*COLS+sc);
+    const p2 = {};
+
+    for(const [tr,tc] of lv.tgts){
+      const tgtKey = tr*COLS+tc;
+      // Reset and re-BFS for this target
+      while(q2.length > 0) q2.pop();
+      v2.clear();
+      q2.push([sr,sc]);
+      v2.add(sr*COLS+sc);
+      
+      let found = false;
+      while(q2.length > 0 && !found){
+        const [r,c] = q2.shift();
+        const key = r*COLS+c;
+        if(key === tgtKey){ found = true; break; }
+        for(const [dr,dc] of [[0,1],[0,-1],[1,0],[-1,0]]){
+          const nr=r+dr, nc=c+dc;
+          if(!inBounds(nr,nc)) continue;
+          const nkey = nr*COLS+nc;
+          if(v2.has(nkey)) continue;
+          if(grid[nr][nc] === BLOCK) continue;
+          v2.add(nkey);
+          p2[nkey] = key;
+          q2.push([nr,nc]);
+        }
+      }
+
+      if(found){
+        let cur = tgtKey;
+        while(cur !== sr*COLS+sc){
+          const [r,c] = [Math.floor(cur/COLS), cur%COLS];
+          if(grid[r][c] === EMPTY && !hintCells.some(([hr,hc]) => hr===r && hc===c)){
+            hintCells.push([r,c]);
+          }
+          cur = p2[cur];
+          if(!cur && cur !== 0) break;
+        }
+      }
+    }
+  }
+
+  if(hintCells.length > 0){
+    hintPath = hintCells;
+    // Auto-dismiss hint after 8s
+    hintTimer = setTimeout(clearHint, 8000);
+    playNote(880,0.15,'sine',0.06);
+    playNote(1108,0.15,'sine',0.06,0.1);
+  } else {
+    playNote(200,0.2,'triangle',0.05);
+    document.getElementById('tooltip').textContent = 'No path found — try clearing some nodes (hint works best on an empty grid)';
+    setTimeout(() => updateTooltip(), 2500);
+  }
+}
+
 // ── WAVE LOGIC ──
 function startPulse(){
   initAudio();
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+  clearHint();
   resetWave();
   state = 'PULSING';
-  document.getElementById('pulseBtn').disabled = true;
-  document.getElementById('pulseBtn').textContent = '⟳ PULSING';
+  pulseBtn.disabled = true;
+  pulseBtn.textContent = '⟳ PULSING';
   document.getElementById('tooltip').textContent = 'Signal propagating...';
 
   const [sr,sc] = LEVELS[L].src;
   visited[sr][sc] = true;
   waveCells = [[sr,sc]];
-  waveStep = 0;
   playNodeSound(SRC);
 
   waveTimer = setInterval(waveTick, 250);
@@ -306,8 +606,6 @@ function startPulse(){
 
 function waveTick(){
   if(state !== 'PULSING') return;
-
-  // Compute next wavefront
   const next = [];
   const seen = new Set();
   for(const [r,c] of waveCells){
@@ -323,22 +621,15 @@ function waveTick(){
   }
 
   if(next.length === 0){
-    // Check win first
     const lv = LEVELS[L];
     const allReached = lv.tgts.every(([tr,tc])=>visited[tr][tc]);
-    if(allReached){
-      doWin();
-    } else {
-      doFail();
-    }
+    if(allReached){ doWin(); } else { doFail(); }
     return;
   }
 
-  // Mark next as visited and play sounds
   for(const [r,c] of next){
     visited[r][c] = true;
     playNodeSound(grid[r][c]);
-    // Spawn particles
     for(let i=0;i<4;i++){
       particles.push({
         x:c*CELL+CELL/2, y:r*CELL+CELL/2,
@@ -349,31 +640,25 @@ function waveTick(){
       });
     }
   }
-
   waveCells = next;
-  waveStep++;
 
-  // Check win
   const lv = LEVELS[L];
   const allReached = lv.tgts.every(([tr,tc])=>visited[tr][tc]);
   if(allReached){
     clearInterval(waveTimer); waveTimer=null;
     setTimeout(doWin, 300);
-    return;
   }
 }
 
 function doWin(){
   state = 'DONE';
   if(waveTimer){clearInterval(waveTimer);waveTimer=null}
-  document.getElementById('pulseBtn').textContent = '✓ COMPLETE';
+  pulseBtn.textContent = '✓ COMPLETE';
   document.getElementById('tooltip').textContent = 'All targets reached! ✦';
-  // triumphant chord
   playNote(523.3,0.5,'sine',0.1,0);
   playNote(659.3,0.5,'sine',0.08,0.1);
   playNote(784,0.6,'sine',0.07,0.2);
   playNote(1046.5,0.8,'sine',0.06,0.3);
-  // big particle burst
   for(let i=0;i<60;i++){
     const ctr = LEVELS[L].tgts[0] || [4,4];
     const angle = Math.random()*Math.PI*2;
@@ -401,21 +686,17 @@ function doWin(){
 function doFail(){
   state = 'FAIL';
   if(waveTimer){clearInterval(waveTimer);waveTimer=null}
-  document.getElementById('pulseBtn').textContent = '✕ LOST';
+  pulseBtn.textContent = '✕ LOST';
   document.getElementById('tooltip').textContent = 'The signal died. Try a different path.';
-  setTimeout(()=>{
-    document.getElementById('fail-overlay').classList.add('active');
-  }, 300);
+  setTimeout(()=>{document.getElementById('fail-overlay').classList.add('active');}, 300);
 }
 
 // ── DRAWING ──
-let animTime = 0;
 function draw(){
   animTime += 0.016;
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
 
-  // Background
   ctx.fillStyle = '#0d0d1a';
   ctx.fillRect(0,0,W,H);
 
@@ -429,11 +710,32 @@ function draw(){
     ctx.beginPath(); ctx.moveTo(c*CELL,0); ctx.lineTo(c*CELL,H); ctx.stroke();
   }
 
+  // Hint path glow (behind cells)
+  if(hintPath.length > 0){
+    const pulse = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(animTime * 3));
+    for(const [r,c] of hintPath){
+      const x=c*CELL, y=r*CELL;
+      const grad = ctx.createRadialGradient(x+CELL/2,y+CELL/2,2,x+CELL/2,y+CELL/2,CELL*0.8);
+      grad.addColorStop(0, `rgba(255,187,0,${0.15*pulse})`);
+      grad.addColorStop(0.6, `rgba(255,187,0,${0.08*pulse})`);
+      grad.addColorStop(1, 'rgba(255,187,0,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x+CELL/2,y+CELL/2,CELL*0.8,0,Math.PI*2);
+      ctx.fill();
+      // Dotted outline on hinted cells
+      ctx.strokeStyle = `rgba(255,187,0,${0.25*pulse})`;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3,3]);
+      ctx.strokeRect(x+3,y+3,CELL-6,CELL-6);
+      ctx.setLineDash([]);
+    }
+  }
+
   // Cells
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     const t = grid[r][c];
-    const x=c*CELL, y=r*CELL;
-    drawCell(x,y,t,r,c);
+    drawCell(c*CELL, r*CELL, t, r, c);
   }
 
   // Visited overlay
@@ -446,13 +748,12 @@ function draw(){
     }
   }
 
-  // Wavefront glow animation
+  // Wavefront glow
   const pulse = 0.5 + 0.5 * Math.sin(animTime * 6);
   for(const [r,c] of waveCells){
     const x=c*CELL, y=r*CELL;
     const t = grid[r][c];
     const color = COLORS[t] || '#00ccff';
-    // outer glow
     const grad = ctx.createRadialGradient(x+CELL/2,y+CELL/2,2,x+CELL/2,y+CELL/2,CELL*0.7);
     grad.addColorStop(0, color + '55');
     grad.addColorStop(0.5, color + '22');
@@ -461,7 +762,6 @@ function draw(){
     ctx.beginPath();
     ctx.arc(x+CELL/2,y+CELL/2,CELL*0.7,0,Math.PI*2);
     ctx.fill();
-    // inner ring
     ctx.strokeStyle = color + Math.round(80+175*pulse).toString(16).padStart(2,'0');
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -471,15 +771,13 @@ function draw(){
 
   // Particles + tap flash
   ctx.save();
-  // Tap flash feedback
   for(let i=tapFlashes.length-1;i>=0;i--){
     const f = tapFlashes[i];
     f.life -= f.decay;
     if(f.life <= 0){tapFlashes.splice(i,1); continue}
-    const fx = f.c*CELL, fy = f.r*CELL;
     ctx.globalAlpha = f.life * 0.5;
-    ctx.fillStyle = '#00ff88';
-    ctx.fillRect(fx+4, fy+4, CELL-8, CELL-8);
+    ctx.fillStyle = f.color || '#00ff88';
+    ctx.fillRect(f.c*CELL+4, f.r*CELL+4, CELL-8, CELL-8);
     ctx.globalAlpha = 1;
   }
   for(let i=particles.length-1;i>=0;i--){
@@ -501,7 +799,6 @@ function draw(){
 function drawCell(x,y,t,r,c){
   const cx = x+CELL/2, cy = y+CELL/2;
   const color = COLORS[t] || 'transparent';
-  const isVis = visited[r][c];
 
   if(t === EMPTY) return;
 
@@ -518,20 +815,15 @@ function drawCell(x,y,t,r,c){
     return;
   }
 
-  // Background fill
   ctx.fillStyle = color + '18';
   ctx.fillRect(x+2,y+2,CELL-4,CELL-4);
-
-  // Border
   ctx.strokeStyle = color + '44';
   ctx.lineWidth = 1;
   ctx.strokeRect(x+2,y+2,CELL-4,CELL-4);
 
-  // Glow
-  if(t === SRC || t === TGT || isVis){
+  if(t === SRC || t === TGT){
     const grad = ctx.createRadialGradient(cx,cy,2,cx,cy,CELL*0.5);
-    const alpha = isVis ? '22' : '15';
-    grad.addColorStop(0, color + alpha);
+    grad.addColorStop(0, color + '22');
     grad.addColorStop(1, color + '00');
     ctx.fillStyle = grad;
     ctx.beginPath();
@@ -539,7 +831,6 @@ function drawCell(x,y,t,r,c){
     ctx.fill();
   }
 
-  // Symbol
   if(t === SRC || t === TGT || t === WIRE || t === SPLIT || t === RESO){
     ctx.shadowColor = color;
     ctx.shadowBlur = t===SRC||t===TGT ? 15 : 8;
@@ -553,9 +844,6 @@ function drawCell(x,y,t,r,c){
 }
 
 // ── INPUT ──
-// Tap flash feedback
-let tapFlashes = [];
-
 function getCellFromPos(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
   const x = clientX - rect.left;
@@ -567,47 +855,57 @@ function getCellFromPos(clientX, clientY){
   return inBounds(cy,cx) ? [cy,cx] : null;
 }
 
-function cycleNode(r,c){
+function placeNode(r,c){
   if(state === 'PULSING') return;
   if(fixed[r][c]) return;
+  clearHint();
   initAudio();
-  const cur = grid[r][c];
-  // cycle: EMPTY → WIRE → SPLIT → RESO → EMPTY
-  const next = cur === EMPTY ? WIRE : cur === WIRE ? SPLIT : cur === SPLIT ? RESO : EMPTY;
-  grid[r][c] = next;
-  resetWave();
-  if(next !== EMPTY){
-    playNote(500+Math.random()*200,0.06,'sine',0.04);
+
+  if(selectedTool === null){
+    // Eraser: remove whatever is there
+    if(grid[r][c] !== EMPTY){
+      grid[r][c] = EMPTY;
+      resetWave();
+      playNote(300,0.06,'triangle',0.03);
+      tapFlashes.push({r,c,life:1,decay:0.06,color:'#ff4466'});
+    }
+  } else {
+    // Place the selected tool
+    if(grid[r][c] === selectedTool){
+      // Toggle off: remove it
+      grid[r][c] = EMPTY;
+      resetWave();
+      tapFlashes.push({r,c,life:1,decay:0.06,color:'#ff4466'});
+    } else {
+      grid[r][c] = selectedTool;
+      resetWave();
+      playNote(500+Math.random()*200,0.06,'sine',0.04);
+      tapFlashes.push({r,c,life:1,decay:0.06,color:COLORS[selectedTool] || '#00ff88'});
+    }
   }
-  // tap flash feedback
-  tapFlashes.push({r,c,life:1,decay:0.06});
 }
 
-// Pointer Events API — unified mouse + touch + pen (works on Fire OS 5+)
 canvas.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   initAudio();
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
   const cell = getCellFromPos(e.clientX, e.clientY);
-  if(cell) cycleNode(cell[0],cell[1]);
+  if(cell) placeNode(cell[0],cell[1]);
   try{canvas.setPointerCapture(e.pointerId)}catch(e){}
 });
 
-// Fallback click for browsers without pointer events
 canvas.addEventListener('click', (e) => {
-  // Only fire if pointerdown didn't already handle this cell
-  // (click fires ~300ms after pointerdown on touch)
   initAudio();
   const cell = getCellFromPos(e.clientX, e.clientY);
-  if(cell && !fixed[cell[0]][cell[1]] && grid[cell[0]][cell[1]] === EMPTY) {
-    // Only handle if the cell is still EMPTY (pointerdown didn't set it)
-    cycleNode(cell[0],cell[1]);
+  if(cell && !fixed[cell[0]][cell[1]] && grid[cell[0]][cell[1]] === EMPTY && selectedTool !== null) {
+    placeNode(cell[0],cell[1]);
   }
 });
 
 // ── CONTROLS ──
 const pulseBtn = document.getElementById('pulseBtn');
 const clearBtn = document.getElementById('clearBtn');
+const hintBtn = document.getElementById('hintBtn');
 
 function handlePulse(){
   if(state === 'PULSING') return;
@@ -615,33 +913,53 @@ function handlePulse(){
 }
 function handleClear(){
   if(state === 'PULSING') return;
+  clearHint();
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     if(!fixed[r][c]) grid[r][c] = EMPTY;
   }
   resetWave();
   playNote(200,0.1,'triangle',0.04);
+  document.getElementById('tooltip').textContent = 'Grid cleared — select a tool and start building!';
+  setTimeout(updateTooltip, 2000);
+}
+function handleHint(){
+  if(state === 'PULSING') return;
+  findHint();
 }
 
-// Pointerdown for instant tap response on mobile
 pulseBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); handlePulse(); });
 clearBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); handleClear(); });
-// Click fallback for desktop
+hintBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); handleHint(); });
 pulseBtn.addEventListener('click', handlePulse);
 clearBtn.addEventListener('click', handleClear);
+hintBtn.addEventListener('click', handleHint);
 
+// ── HELP OVERLAY ──
+const helpOverlay = document.getElementById('help-overlay');
+document.getElementById('help-btn').addEventListener('click', () => {
+  initAudio();
+  helpOverlay.classList.toggle('active');
+  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+  playNote(600,0.1,'sine',0.04);
+});
+helpOverlay.querySelector('.close-help').addEventListener('click', () => {
+  helpOverlay.classList.remove('active');
+});
+helpOverlay.addEventListener('click', (e) => {
+  if(e.target === helpOverlay) helpOverlay.classList.remove('active');
+});
+
+// Next / retry
 document.getElementById('nextLvlBtn').addEventListener('click',()=>{
   if(L < LEVELS.length-1){
     loadLevel(L+1);
-    resetWave();
     document.getElementById('victory-overlay').classList.remove('active');
   }
 });
-
 document.getElementById('retryVBtn').addEventListener('click',()=>{
   document.getElementById('victory-overlay').classList.remove('active');
   loadLevel(L);
 });
-
 document.getElementById('retryBtn').addEventListener('click',()=>{
   document.getElementById('fail-overlay').classList.remove('active');
   loadLevel(L);
@@ -650,6 +968,7 @@ document.getElementById('retryBtn').addEventListener('click',()=>{
 // ── KEYBOARD ──
 document.addEventListener('keydown',(e)=>{
   if(e.key === 'Enter'||e.key===' '){
+    if(helpOverlay.classList.contains('active')) return;
     if(document.getElementById('victory-overlay').classList.contains('active')){
       if(L<LEVELS.length-1) document.getElementById('nextLvlBtn').click();
       return;
@@ -660,17 +979,27 @@ document.addEventListener('keydown',(e)=>{
     }
     if(state !== 'PULSING') startPulse();
   }
-  if(e.key === 'r'||e.key==='R') document.getElementById('clearBtn').click();
+  if(e.key === 'r'||e.key==='R'){ e.preventDefault(); handleClear(); }
+  if(e.key === 'h'||e.key==='H'){ e.preventDefault(); handleHint(); }
+  if(e.key === '?'||e.key==='/'){ e.preventDefault(); document.getElementById('help-btn').click(); }
+  // Tool shortcuts
+  if(e.key === '1'){ e.preventDefault(); selectTool(WIRE); }
+  if(e.key === '2'){ e.preventDefault(); selectTool(SPLIT); }
+  if(e.key === '3'){ e.preventDefault(); selectTool(RESO); }
+  if(e.key === '4'){ e.preventDefault(); selectTool(null); }
 });
 
 // ── INIT ──
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+buildPalette();
+selectTool(WIRE); // Default to wire tool
 loadLevel(0);
 draw();
 
 console.log('⚡ RESONATE prototype ready');
-console.log('Click cells to place nodes, then press PULSE or Space');
+console.log('Tools: 1=Wire  2=Splitter  3=Resonator  4=Eraser');
+console.log('Space=Pulse  R=Clear  H=Hint  ?=Help');
 </script>
 </body>
 </html>
