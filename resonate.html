@@ -590,7 +590,7 @@ canvas.addEventListener('pointerdown', (e) => {
   if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
   const cell = getCellFromPos(e.clientX, e.clientY);
   if(cell) cycleNode(cell[0],cell[1]);
-  canvas.setPointerCapture(e.pointerId);
+  try{canvas.setPointerCapture(e.pointerId)}catch(e){}
 });
 
 // Fallback click for browsers without pointer events
