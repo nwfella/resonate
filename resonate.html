@@ -11,7 +11,8 @@ body{
   font-family:'Segoe UI',system-ui,sans-serif;
   display:flex;justify-content:center;align-items:center;
   min-height:100svh;overflow:hidden;
-  -webkit-tap-highlight-color:transparent;user-select:none
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;user-select:none
 }
 #app{text-align:center;padding:12px}
 h1{
@@ -468,8 +469,19 @@ function draw(){
     ctx.stroke();
   }
 
-  // Particles
+  // Particles + tap flash
   ctx.save();
+  // Tap flash feedback
+  for(let i=tapFlashes.length-1;i>=0;i--){
+    const f = tapFlashes[i];
+    f.life -= f.decay;
+    if(f.life <= 0){tapFlashes.splice(i,1); continue}
+    const fx = f.c*CELL, fy = f.r*CELL;
+    ctx.globalAlpha = f.life * 0.5;
+    ctx.fillStyle = '#00ff88';
+    ctx.fillRect(fx+4, fy+4, CELL-8, CELL-8);
+    ctx.globalAlpha = 1;
+  }
   for(let i=particles.length-1;i>=0;i--){
     const p = particles[i];
     p.x += p.vx; p.y += p.vy;
@@ -541,6 +553,9 @@ function drawCell(x,y,t,r,c){
 }
 
 // ── INPUT ──
+// Tap flash feedback
+let tapFlashes = [];
+
 function getCellFromPos(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
   const x = clientX - rect.left;
@@ -564,34 +579,55 @@ function cycleNode(r,c){
   if(next !== EMPTY){
     playNote(500+Math.random()*200,0.06,'sine',0.04);
   }
+  // tap flash feedback
+  tapFlashes.push({r,c,life:1,decay:0.06});
 }
 
-canvas.addEventListener('click',(e)=>{
+// Pointer Events API — unified mouse + touch + pen (works on Fire OS 5+)
+canvas.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  initAudio();
+  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
   const cell = getCellFromPos(e.clientX, e.clientY);
   if(cell) cycleNode(cell[0],cell[1]);
+  canvas.setPointerCapture(e.pointerId);
 });
 
-canvas.addEventListener('touchstart',(e)=>{
-  e.preventDefault();
-  const touch = e.changedTouches[0];
-  const cell = getCellFromPos(touch.clientX, touch.clientY);
-  if(cell) cycleNode(cell[0],cell[1]);
-},{passive:false});
+// Fallback click for browsers without pointer events
+canvas.addEventListener('click', (e) => {
+  // Only fire if pointerdown didn't already handle this cell
+  // (click fires ~300ms after pointerdown on touch)
+  initAudio();
+  const cell = getCellFromPos(e.clientX, e.clientY);
+  if(cell && !fixed[cell[0]][cell[1]] && grid[cell[0]][cell[1]] === EMPTY) {
+    // Only handle if the cell is still EMPTY (pointerdown didn't set it)
+    cycleNode(cell[0],cell[1]);
+  }
+});
 
 // ── CONTROLS ──
-document.getElementById('pulseBtn').addEventListener('click',()=>{
+const pulseBtn = document.getElementById('pulseBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+function handlePulse(){
   if(state === 'PULSING') return;
   startPulse();
-});
-
-document.getElementById('clearBtn').addEventListener('click',()=>{
+}
+function handleClear(){
   if(state === 'PULSING') return;
   for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
     if(!fixed[r][c]) grid[r][c] = EMPTY;
   }
   resetWave();
   playNote(200,0.1,'triangle',0.04);
-});
+}
+
+// Pointerdown for instant tap response on mobile
+pulseBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); handlePulse(); });
+clearBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); handleClear(); });
+// Click fallback for desktop
+pulseBtn.addEventListener('click', handlePulse);
+clearBtn.addEventListener('click', handleClear);
 
 document.getElementById('nextLvlBtn').addEventListener('click',()=>{
   if(L < LEVELS.length-1){
